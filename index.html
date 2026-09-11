@@ -12,7 +12,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
         }
         .card {
@@ -24,25 +24,36 @@
             max-width: 400px;
             width: 90%;
         }
-        .btn-discord {
-            background-color: #5865F2;
-            color: white;
+        .btn {
             border: none;
-            padding: 12px 24px;
-            font-size: 16px;
+            padding: 12px 20px;
+            font-size: 15px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
-            transition: background 0.3s;
+            transition: opacity 0.3s;
             text-decoration: none;
             display: inline-block;
-            margin-top: 15px;
+            margin: 8px 4px;
         }
-        .btn-discord:hover {
-            background-color: #4752C4;
+        .btn:hover {
+            opacity: 0.85;
+        }
+        .btn-discord {
+            background-color: #5865F2;
+            color: white;
+        }
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .btn-nav {
+            background-color: #0f3460;
+            color: white;
+            border: 1px solid #e94560;
         }
         .user-info {
-            margin-top: 20px;
+            margin-top: 15px;
         }
         .avatar {
             width: 80px;
@@ -50,77 +61,121 @@
             border-radius: 50%;
             margin-bottom: 10px;
         }
+        .menu-container {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #1f4068;
+        }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <h1>Website Elcida</h1>
-        <p>Silahkan login menggunakan akun Discord kamu.</p>
+        <!-- Klik 3 kali judul ini untuk membuka Developer Room -->
+        <h1 id="app-title" style="cursor: pointer; user-select: none;">Website Elcida</h1>
+        <p id="welcome-text">Silahkan login menggunakan akun Discord kamu.</p>
 
         <!-- Tombol Login -->
-        <button id="login-btn" class="btn-discord" onclick="loginDiscord()">Login dengan Discord</button>
+        <button id="login-btn" class="btn btn-discord" onclick="loginDiscord()">Login dengan Discord</button>
 
-        <!-- Tempat Tampilan Profil Setelah Login -->
+        <!-- Tempat Tampilan Profil & Navigasi Setelah Login -->
         <div id="user-profile" class="user-info" style="display: none;">
             <img id="user-avatar" class="avatar" src="" alt="Avatar">
             <h2 id="user-name"></h2>
             <p id="user-id"></p>
+            
+            <!-- Menu Navigasi Ke Halaman Lain -->
+            <div class="menu-container">
+                <a href="galeri.html" class="btn btn-nav">Galeri</a>
+                <a href="cerita.html" class="btn btn-nav">Cerita</a>
+                <a href="certs.html" class="btn btn-nav">Certs</a>
+            </div>
+
+            <!-- Tombol Logout -->
+            <button class="btn btn-danger" onclick="logout()" style="margin-top: 15px;">Logout</button>
         </div>
     </div>
 
     <script>
-        // ==========================================
-        // PENTING: GANTI DENGAN CLIENT ID MILIKMU!
-        // ==========================================
-        const DISCORD_CLIENT_ID = "1547833891098730571"; // <-- Masukkan Client ID Discord kamu di sini
-
-        // Redirect URI otomatis mengambil URL GitHub Pages kamu saat ini
+        const DISCORD_CLIENT_ID = "1547833891098730571";
         const REDIRECT_URI = "https://aanmaulanayasir37-droid.github.io/Website-elcida/";
+
+        // Rahasia: Klik judul 3x + Passcode 123
+        let clickCount = 0;
+        document.getElementById('app-title').addEventListener('click', () => {
+            clickCount++;
+            if (clickCount === 3) {
+                const code = prompt("Masukkan passcode rahasia:");
+                if (code === "123") {
+                    window.location.href = "developer.html";
+                } else {
+                    alert("Passcode salah!");
+                }
+                clickCount = 0;
+            }
+        });
 
         function loginDiscord() {
             const oauthUrl = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
             window.location.href = oauthUrl;
         }
 
-        // Fungsi membaca Token setelah Redirect dari Discord
+        function showUserData(user) {
+            document.getElementById('login-btn').style.display = 'none';
+            document.getElementById('welcome-text').innerText = 'Selamat datang kembali!';
+            document.getElementById('user-profile').style.display = 'block';
+            document.getElementById('user-name').innerText = user.name;
+            document.getElementById('user-id').innerText = `ID: ${user.id}`;
+            document.getElementById('user-avatar').src = user.avatar;
+        }
+
         function handleOAuth() {
+            // 1. Cek dulu apakah user sudah tersimpan di localStorage
+            const savedUser = localStorage.getItem('elcida_user');
+            if (savedUser) {
+                showUserData(JSON.parse(savedUser));
+                return;
+            }
+
+            // 2. Jika belum, cek token redirect dari Discord
             const fragment = new URLSearchParams(window.location.hash.slice(1));
             const accessToken = fragment.get('access_token');
 
             if (accessToken) {
-                // Ambil data profil dari Discord API
                 fetch('https://discord.com/api/users/@me', {
-                    headers: {
-                        authorization: `Bearer ${accessToken}`
-                    }
+                    headers: { authorization: `Bearer ${accessToken}` }
                 })
                 .then(res => res.json())
                 .then(response => {
                     const { username, discriminator, avatar, id } = response;
-                    
-                    // Sembunyikan tombol login
-                    document.getElementById('login-btn').style.display = 'none';
+                    const avatarUrl = avatar 
+                        ? `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`
+                        : `https://cdn.discordapp.com/embed/avatars/0.png`;
 
-                    // Tampilkan data profil
-                    document.getElementById('user-profile').style.display = 'block';
-                    document.getElementById('user-name').innerText = `${username}#${discriminator}`;
-                    document.getElementById('user-id').innerText = `ID: ${id}`;
-                    
-                    if (avatar) {
-                        document.getElementById('user-avatar').src = `https://cdn.discordapp.com/avatars/${id}/${avatar}.png`;
-                    } else {
-                        document.getElementById('user-avatar').src = `https://cdn.discordapp.com/embed/avatars/0.png`;
-                    }
+                    const userData = {
+                        name: `${username}#${discriminator}`,
+                        id: id,
+                        avatar: avatarUrl
+                    };
 
-                    // Bersihkan Hash token dari URL agar rapi
+                    // Simpan data login ke browser
+                    localStorage.setItem('elcida_user', JSON.stringify(userData));
+
+                    // Tampilkan profil
+                    showUserData(userData);
+
+                    // Bersihkan Hash URL
                     window.history.replaceState({}, document.title, window.location.pathname);
                 })
                 .catch(console.error);
             }
         }
 
-        // Jalankan pengecekan token saat halaman dimuat
+        function logout() {
+            localStorage.removeItem('elcida_user');
+            window.location.reload();
+        }
+
         window.onload = handleOAuth;
     </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galeri - Elcida</title>
+    <title>Sertifikat - Elcida</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -35,17 +35,12 @@
         .btn-back:hover {
             background-color: #1a1a2e;
         }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .card-item {
+        .cert-card {
             background-color: #0f3460;
             padding: 15px;
             border-radius: 8px;
-            text-align: center;
+            margin-top: 15px;
+            border-left: 4px solid #e94560;
         }
     </style>
 </head>
@@ -55,27 +50,15 @@
         <!-- Tombol Kembali -->
         <a href="index.html" class="btn-back">⬅ Kembali ke Beranda</a>
 
-        <h1>Galeri Elcida</h1>
-        <p>Selamat datang di galeri dokumentasi dan foto.</p>
+        <h1>Sertifikat & Penghargaan</h1>
 
-        <div class="grid">
-            <div class="card-item">
-                <h3>Foto 1</h3>
-                <p>Keterangan galeri 1</p>
-            </div>
-            <div class="card-item">
-                <h3>Foto 2</h3>
-                <p>Keterangan galeri 2</p>
-            </div>
-            <div class="card-item">
-                <h3>Foto 3</h3>
-                <p>Keterangan galeri 3</p>
-            </div>
+        <div class="cert-card">
+            <h3>Sertifikat #1</h3>
+            <p>Deskripsi pencapaian atau sertifikasi.</p>
         </div>
     </div>
 
     <script>
-        // Cek apakah user sudah login
         if (!localStorage.getItem('elcida_user')) {
             alert('Silahkan login terlebih dahulu!');
             window.location.href = 'index.html';

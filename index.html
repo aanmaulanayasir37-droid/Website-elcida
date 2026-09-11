@@ -71,27 +71,22 @@
 <body>
 
     <div class="card">
-        <!-- Klik 3 kali judul ini untuk membuka Developer Room -->
         <h1 id="app-title" style="cursor: pointer; user-select: none;">Website Elcida</h1>
         <p id="welcome-text">Silahkan login menggunakan akun Discord kamu.</p>
 
-        <!-- Tombol Login -->
         <button id="login-btn" class="btn btn-discord" onclick="loginDiscord()">Login dengan Discord</button>
 
-        <!-- Tempat Tampilan Profil & Navigasi Setelah Login -->
         <div id="user-profile" class="user-info" style="display: none;">
             <img id="user-avatar" class="avatar" src="" alt="Avatar">
             <h2 id="user-name"></h2>
             <p id="user-id"></p>
             
-            <!-- Menu Navigasi Ke Halaman Lain -->
             <div class="menu-container">
                 <a href="galeri.html" class="btn btn-nav">Galeri</a>
                 <a href="cerita.html" class="btn btn-nav">Cerita</a>
                 <a href="certs.html" class="btn btn-nav">Certs</a>
             </div>
 
-            <!-- Tombol Logout -->
             <button class="btn btn-danger" onclick="logout()" style="margin-top: 15px;">Logout</button>
         </div>
     </div>
@@ -100,7 +95,6 @@
         const DISCORD_CLIENT_ID = "1547833891098730571";
         const REDIRECT_URI = "https://aanmaulanayasir37-droid.github.io/Website-elcida/";
 
-        // Rahasia: Klik judul 3x + Passcode 123
         let clickCount = 0;
         document.getElementById('app-title').addEventListener('click', () => {
             clickCount++;
@@ -130,14 +124,12 @@
         }
 
         function handleOAuth() {
-            // 1. Cek dulu apakah user sudah tersimpan di localStorage
             const savedUser = localStorage.getItem('elcida_user');
             if (savedUser) {
                 showUserData(JSON.parse(savedUser));
                 return;
             }
 
-            // 2. Jika belum, cek token redirect dari Discord
             const fragment = new URLSearchParams(window.location.hash.slice(1));
             const accessToken = fragment.get('access_token');
 
@@ -158,13 +150,8 @@
                         avatar: avatarUrl
                     };
 
-                    // Simpan data login ke browser
                     localStorage.setItem('elcida_user', JSON.stringify(userData));
-
-                    // Tampilkan profil
                     showUserData(userData);
-
-                    // Bersihkan Hash URL
                     window.history.replaceState({}, document.title, window.location.pathname);
                 })
                 .catch(console.error);
